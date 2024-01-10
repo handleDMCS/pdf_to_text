@@ -1,44 +1,55 @@
-from docx import Document
-from docx.shared import Inches
+import argparse
+import os 
 
-document = Document()
+def get_path_type(path):
+    if os.path.isdir(path):
+        return 'dir'
+    elif os.path.isfile(path):
+        return 'file'
+    else:
+        return 'none'
 
-document.add_heading('Document Title', 0)
+def valid():
+    ip, op = args.ip, args.op
 
-p = document.add_paragraph('A plain paragraph having some ')
-p.add_run('bold').bold = True
-p.add_run(' and some ')
-p.add_run('italic.').italic = True
+    ip_ty = get_path_type(ip)
+    if(ip_ty == 'none'):
+        print("Input must be a folder or a PDF file !")
+        return False
+    if(ip_ty != args.ty):
+        print("-ty doesn't match the input path")
+        return False
+     
+    if(op != ''):
+        op_ty = get_path_type(op)
+        if(op_ty != 'dir'):
+            print("-op must be an existing folder !")
+            return False
+    
+    return True
 
-document.add_heading('Heading, level 1', level=1)
-document.add_paragraph('Intense quote', style='Intense Quote')
+def handle_file():
+    if(valid() == False):
+        return
+    print(get_path_type(args.ip))
 
-document.add_paragraph(
-    'first item in unordered list', style='List Bullet'
-)
-document.add_paragraph(
-    'first item in ordered list', style='List Number'
-)
+def handle_folder():
+    if(valid() == False):
+        return
+    # ip, op = args.ip, args.op
+    # if(op == ''):
+    #     op = os.path.dirname(ip)
+    print('folder')
 
-# document.add_picture('monty-truth.png', width=Inches(1.25))
+parser = argparse.ArgumentParser(description='convert PDF to docx')
+parser.add_argument('ip', type=str)
+parser.add_argument('-op', type=str, default='')
+parser.add_argument('-ty', choices=['file', 'dir'], default='file')
+parser.add_argument('-la', choices=['eng', 'vie'], default='vie')
+args = parser.parse_args()
 
-records = (
-    (3, '101', 'Spam'),
-    (7, '422', 'Eggs'),
-    (4, '631', 'Spam, spam, eggs, and spam')
-)
-
-table = document.add_table(rows=1, cols=3)
-hdr_cells = table.rows[0].cells
-hdr_cells[0].text = 'Qty'
-hdr_cells[1].text = 'Id'
-hdr_cells[2].text = 'Desc'
-for qty, id, desc in records:
-    row_cells = table.add_row().cells
-    row_cells[0].text = str(qty)
-    row_cells[1].text = id
-    row_cells[2].text = desc
-
-document.add_page_break()
-
-document.save('demo.docx')
+match args.ty:
+    case 'file':
+        handle_file()
+    case 'folder':
+        handle_folder()
