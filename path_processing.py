@@ -1,4 +1,13 @@
 import os
+import shutil
+
+def init_directory(directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+def clear_directory_content(dir):
+    shutil.rmtree(dir)
+    os.makedirs(dir)
 
 def get_path_type(fpath):
     if os.path.isdir(fpath):
