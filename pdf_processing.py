@@ -8,9 +8,10 @@ import re
 pytesseract.pytesseract.tesseract_cmd =r'pytessaract\tesseract.exe'
 
 img = None
-height, width = None, None
+width, height = None, None
 txt, data = None, None
 la = None
+include_pic = None
 
 def get_box_paragraph():
     curr_box = 0
@@ -38,6 +39,12 @@ def get_box_paragraph():
         box_list.append((paragraph, (min_x, min_y, max_x, max_y)))
     return box_list
 
+def add_pic(page, bbox):
+    if not include_pic:
+        return
+    if(image_processing.has_content(img, bbox)):
+        page.append(image_processing.crop(img, bbox))
+
 def get_page():
     global width, height, txt, data
     height, width = img.shape[:2]
@@ -50,21 +57,20 @@ def get_page():
     for (paragraph, bbox) in paragraph_box_list:
         (min_x, min_y, max_x, max_y) = bbox
         gap = (0, prev, width, min_y)
-        if(image_processing.has_content(img, gap)):
-            page.append(image_processing.crop(img, gap))
+        add_pic(page, gap)
         page.append(paragraph)
         prev = max_y
     gap = (0, prev, width, height)
-    if(image_processing.has_content(img, gap)):
-        page.append(image_processing.crop(img, gap))
+    add_pic(page, gap)
         
     return page
 
-def get_content(pdf, arg_la):
-    global img, la
-    la = arg_la
+def get_content(path, args):
+    global img, la, include_pic
+    la = args.la
     content_list = []
-    images = pdf2image.convert_from_path(pdf_path=pdf, poppler_path=r'poppler/bin')
+    include_pic = bool(args.pic)
+    images = pdf2image.convert_from_path(pdf_path=path, poppler_path=r'poppler/bin')
     first_page = cv2.cvtColor(np.array(images[0]), cv2.COLOR_RGB2BGR)
     for pg, elem in enumerate(images):
         img = image_processing.PIL_to_cv2(elem)

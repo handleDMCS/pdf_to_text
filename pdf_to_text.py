@@ -29,7 +29,7 @@ def handle_file():
     if(op == ''):
         op = os.path.dirname(ip)
 
-    doc = docx_processing.get_docx(ip, args.la)
+    doc = docx_processing.get_docx(ip, args)
     res_path = path_processing.get_f_name(par=op, fname=os.path.basename(ip)[:-4], ex='.docx') 
     print(f"Your output file is saved at : {res_path}")
     doc.save(res_path)    
@@ -49,7 +49,7 @@ def handle_dir():
         path = os.path.join(ip, file)
         if path_processing.get_path_type(path) == 'file':
             print(file)
-            doc = docx_processing.get_docx(path, args.la)
+            doc = docx_processing.get_docx(path, args)
             doc.save(f'{op}\{file[:-4]}.docx')
     print(f'Your output files are saved at: {op}')
     
@@ -57,6 +57,7 @@ parser = argparse.ArgumentParser(description='convert PDF to docx')
 parser.add_argument('ip', type=str)
 parser.add_argument('-op', type=str, default='')
 parser.add_argument('-la', choices=['eng', 'vie'], default='vie')
+parser.add_argument('-pic', choices=[0, 1], default=1, type=int)
 args = parser.parse_args()
 
 match path_processing.get_path_type(args.ip):
