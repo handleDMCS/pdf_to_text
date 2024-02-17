@@ -26,7 +26,7 @@ def handle_file(args):
     print(f"Your output file is saved at : {res_path}")
     doc.save(res_path)    
 
-def handle_dir(args):
+def make_output(args):
     if(check_op(args) == False):
         return
     
@@ -37,7 +37,34 @@ def handle_dir(args):
         op = path_processing.get_f_name(fname=f'{os.path.basename(ip)}_to_docx', par=op)
     os.makedirs(op)
 
-    for file in os.listdir(ip):
+def split_list(org_list):
+    """Remove anather files / folder"""
+    for i in org_list:
+        if not i.endswith(".pdf"):
+            org_list.remove(i)
+
+    """Split origin list to 4 lists"""
+    list_1 = []
+    list_2 = []
+    list_3 = []
+    list_4 = []
+
+    for i in range(len(org_list)):
+        if i % 4 == 0:
+            list_4.append(org_list[i])
+        if i % 4 == 1:
+            list_1.append(org_list[i])
+        if i % 4 == 2:
+            list_2.append(org_list[i])
+        if i % 4 == 3:
+            list_3.append(org_list[i])
+    
+    return list_1, list_2, list_3, list_4
+
+def handle_dir(args, op, list):
+    ip = args.ip
+    for file in list:
+
         path = os.path.join(ip, file)
         if path_processing.get_path_type(path) == 'file':
             print(file)
