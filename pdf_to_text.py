@@ -1,16 +1,8 @@
-import pdf2image
-try:
-    from PIL import Image
-except ImportError:
-    import Image
-import pytesseract
-from docx import Document
-import argparse
 import os
 import docx_processing
 import path_processing
 
-def check_op():
+def check_op(args):
     op = args.op
      
     if(op != ''):
@@ -21,8 +13,8 @@ def check_op():
     
     return True
 
-def handle_file():
-    if(check_op() == False):
+def handle_file(args):
+    if(check_op(args) == False):
         return
     
     ip, op = args.ip, args.op
@@ -34,8 +26,8 @@ def handle_file():
     print(f"Your output file is saved at : {res_path}")
     doc.save(res_path)    
 
-def handle_dir():
-    if(check_op() == False):
+def handle_dir(args):
+    if(check_op(args) == False):
         return
     
     ip, op = args.ip, args.op
@@ -53,17 +45,5 @@ def handle_dir():
             doc.save(f'{op}\{file[:-4]}.docx')
     print(f'Your output files are saved at: {op}')
     
-parser = argparse.ArgumentParser(description='convert PDF to docx')
-parser.add_argument('ip', type=str)
-parser.add_argument('-op', type=str, default='')
-parser.add_argument('-la', choices=['eng', 'vie'], default='vie')
-parser.add_argument('-pic', choices=[0, 1], default=1, type=int)
-args = parser.parse_args()
-
-match path_processing.get_path_type(args.ip):
-    case 'file':
-        handle_file()
-    case 'dir':
-        handle_dir()
-    case 'none':
-        print("Input must be a folder or a PDF file !")
+def check_match(args):
+    return path_processing.get_path_type(args.ip)
