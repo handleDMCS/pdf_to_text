@@ -31,11 +31,13 @@ def make_output(args):
         return
     
     ip, op = args.ip, args.op
+    
     if(op == ''):
         op = path_processing.get_f_name(fname=f'{os.path.basename(ip)}_to_docx', par=ip)
     else:
         op = path_processing.get_f_name(fname=f'{os.path.basename(ip)}_to_docx', par=op)
     os.makedirs(op)
+    return op
 
 def split_list(org_list):
     """Remove anather files / folder"""

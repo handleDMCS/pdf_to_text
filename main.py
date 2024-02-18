@@ -22,7 +22,7 @@ if __name__ == "__main__":
             org_list = os.listdir(args.ip)
             l1, l2, l3, l4 = P2T.split_list(org_list)
             output = P2T.make_output(args)
-
+            print(output)
             proc_1 = Process(target= handle_dir, args=(args, output, l1))
             proc_2 = Process(target= handle_dir, args=(args, output, l2))
             proc_3 = Process(target= handle_dir, args=(args, output, l3))
