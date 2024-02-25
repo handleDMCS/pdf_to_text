@@ -1,78 +1,30 @@
-import os
-import docx_processing
-import path_processing
+from pdf2image import convert_from_path
+import numpy as np
+import matplotlib.pyplot as plt
+import os 
 
-def check_op(args):
-    op = args.op
-     
-    if(op != ''):
-        op_ty = path_processing.get_path_type(op)
-        if(op_ty != 'dir'):
-            print("-op must be an existing folder !")
-            return False
-    
-    return True
+def pdf_to_images(pdf_file):
+    # Chuyển đổi từ tệp PDF thành danh sách các ảnh
+    images = convert_from_path(pdf_path=pdf_file, poppler_path=r'poppler/bin')
+    name_file = os.path.basename(pdf_file)
+    list_pages = []
+    index_list = []
+    # Lưu từng ảnh vào thư mục đầu ra
+    for i, image in enumerate(images):
+        list_pages.append(np.array(image))
+        index_list.append(i)
 
-def handle_file(args):
-    if(check_op(args) == False):
-        return
-    
-    ip, op = args.ip, args.op
-    if(op == ''):
-        op = os.path.dirname(ip)
+    return list_pages, index_list, name_file
 
-    doc = docx_processing.get_docx(ip, args)
-    res_path = path_processing.get_f_name(par=op, fname=os.path.basename(ip)[:-4], ex='.docx') 
-    print(f"Your output file is saved at : {res_path}")
-    doc.save(res_path)    
+# Thư mục làm việc hiện tại là F:\Projects\pdf_to_text
+# Thư mục chứa dữ liệu là F:\Projects\datatest
+# Thư mực sẽ chứa các kết quả:  F:\Projects\datatest\output
 
-def make_output(args):
-    if(check_op(args) == False):
-        return
-    
-    ip, op = args.ip, args.op
-    
-    if(op == ''):
-        op = path_processing.get_f_name(fname=f'{os.path.basename(ip)}_to_docx', par=ip)
-    else:
-        op = path_processing.get_f_name(fname=f'{os.path.basename(ip)}_to_docx', par=op)
-    os.makedirs(op)
-    return op
-
-def split_list(org_list):
-    """Remove anather files / folder"""
-    for i in org_list:
-        if not i.endswith(".pdf"):
-            org_list.remove(i)
-
-    """Split origin list to 4 lists"""
-    list_1 = []
-    list_2 = []
-    list_3 = []
-    list_4 = []
-
-    for i in range(len(org_list)):
-        if i % 4 == 0:
-            list_4.append(org_list[i])
-        if i % 4 == 1:
-            list_1.append(org_list[i])
-        if i % 4 == 2:
-            list_2.append(org_list[i])
-        if i % 4 == 3:
-            list_3.append(org_list[i])
-    
-    return list_1, list_2, list_3, list_4
-
-def handle_dir(args, op, list):
-    ip = args.ip
-    for file in list:
-
-        path = os.path.join(ip, file)
-        if path_processing.get_path_type(path) == 'file':
-            print(file)
-            doc = docx_processing.get_docx(path, args)
-            doc.save(f'{op}\{file[:-4]}.docx')
-    print(f'Your output files are saved at: {op}')
-    
-def check_match(args):
-    return path_processing.get_path_type(args.ip)
+# # Sử dụng hàm với tệp PDF đầu vào và thư mục đầu ra
+# pdf_file = r'F:\Projects\datatest\file-sample_150kB.pdf'
+# # output_folder = r'F:\Projects\datatest\output'
+# list_pages, index_list, file_name = pdf_to_images(pdf_file)
+# print(file_name)
+# for i in range(len(index_list)):
+#     print(f"Page:",index_list[i])
+#     print(list_pages[i])
